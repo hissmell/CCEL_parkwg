@@ -9,4 +9,6 @@ setup(
     author_email="parkwg@postech.ac.kr",
     license="parkwg",
     packages=["park_lib"],
+    zip_safe=False,
+    install_requires=[]
 )
