@@ -165,10 +165,20 @@ def copy_run_poscar():
     else:
         print(f"{source} not found")
 
+def copy_common():
+    source = os.path.join(os.path.dirname(os.path.abspath(__file__)), "common.py")
+    destination = os.path.join(os.getcwd(), "common.py")
+
+    if os.path.exists(source):
+        shutil.copy(source, destination)
+        print(f"Successfully copied {source} to {destination}")
+    else:
+        print(f"{source} not found")
 def start():
     copy_main()
     copy_make_poscar()
     copy_run_poscar()
+    copy_common()
     return
 
 if __name__ == "__main__":
