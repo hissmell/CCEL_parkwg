@@ -15,7 +15,6 @@ working_dir = args.working_dir
 move_dir(working_dir)
 
 ''' write calculation setting! '''
-
 magmom = {"Pt" : 2, "Fe" : 4, "Co" : 3, "Ni" : 2, "Cu" : 1, "Zn" : 0}
 
 atoms = read(poscar_path)
