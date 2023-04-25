@@ -30,7 +30,7 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path):
     return run_slurm_path, working_dir
 
 def check_dict(x=[]):
-    if (type(x) != list) or (type(x) != dict):
+    if (type(x) != list) and (type(x) != dict):
         raise Exception("List or Dictionaty type must be put")
 
     if type(x) == list:
