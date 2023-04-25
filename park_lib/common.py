@@ -29,6 +29,18 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path):
         f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir}\n")
     return run_slurm_path, working_dir
 
+def check_dict(x=[]):
+    if (type(x) != list) or (type(x) != dict):
+        raise Exception("List or Dictionaty type must be put")
+
+    if type(x) == list:
+        d = dict()
+        for l in x:
+            d[l] = l
+    else:
+        d = x
+
+    return d
 def write_describe_txt(describe=""):
     with open(os.path.join(os.getcwd(),"describe.txt"),mode="w") as f:
         f.write(describe)

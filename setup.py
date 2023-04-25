@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="ccel_park",
-    version="0.0.1",
+    version="0.0.2",
     description="vasp envionment setting",
     url="https://github.com/hissmell/CCEL_parkwg.git",
     author="Park_wongyu",
