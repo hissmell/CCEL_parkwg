@@ -10,5 +10,5 @@ setup(
     license="parkwg",
     packages=["park_lib"],
     zip_safe=False,
-    install_requires=["ase=3.22.1"]
+    install_requires=["ase"]
 )
