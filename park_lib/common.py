@@ -133,6 +133,15 @@ def save_path_describe_dict(str_dir = os.getcwd()):
 def str_to_list(s):
     return s.split()
 
+def check_restart(restart_flag,working_dir):
+    if restart_flag:
+        if os.path.isfile(os.path.join(working_dir,"CONTCAR")):
+            return True
+        else:
+            raise Exception("There's no file to continue (CONTCAR file)")
+    return False
+
+
 class PathNode:
     def __init__(self,describe='R',path=None):
         self.describe = describe

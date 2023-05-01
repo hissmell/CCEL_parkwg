@@ -1,5 +1,5 @@
 from common import load_path_node, find_describe_path,\
-    read_describe_txt, write_run_slurm_sh, move_dir
+    read_describe_txt, write_run_slurm_sh, move_dir, check_restart
 from argparse import ArgumentParser
 from ase.calculators.vasp import Vasp
 from ase.io import read
@@ -8,12 +8,14 @@ import os, subprocess
 parser = ArgumentParser()
 parser.add_argument("-p","--poscar_path",type=str,required=True)
 parser.add_argument("-w","--working_dir",type=str,required=True)
+parser.add_argument("-r","--restart",default=True,action="store_false")
 args = parser.parse_args()
 
 poscar_path = args.poscar_path
 working_dir = args.working_dir
 move_dir(working_dir)
 
+RESTART = check_restart(args.restart)
 ''' write calculation setting! '''
 magmom = {"Pt" : 2, "Fe" : 4, "Co" : 3, "Ni" : 2, "Cu" : 1, "Zn" : 0}
 
@@ -42,7 +44,8 @@ calc = Vasp(
         npar=4,
         lwave=".FALSE.",
         lcharg=".FALSE.",
-        atoms=atoms
+        atoms=atoms,
+        restart=RESTART
     )
 
 _ = atoms.get_potential_energy()
