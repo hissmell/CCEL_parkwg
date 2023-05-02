@@ -1,5 +1,5 @@
 from common import load_path_node, find_describe_path,\
-    read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list
+    read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict
 from argparse import ArgumentParser
 import os, subprocess
 
@@ -14,6 +14,7 @@ node = args.node
 describe_str_list = args.describe_str_list
 
 root_dir = os.getcwd()
+save_path_describe_dict()
 path_describe_dict = load_path_describe_dict()
 
 for dir_path,dir_names,file_names in os.walk(root_dir):
