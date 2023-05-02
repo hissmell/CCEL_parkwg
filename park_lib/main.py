@@ -8,10 +8,12 @@ import os, subprocess
 parser = ArgumentParser()
 parser.add_argument("-d","--describe_str_list",type=str_to_list,required=True,default=[])
 parser.add_argument("-n","--node",type=int,required=True)
+parser.add_argument("-r","--restart_false",default=True,action="store_false")
 args = parser.parse_args()
 
 node = args.node
 describe_str_list = args.describe_str_list
+restart_false = args.restart_false
 
 root_dir = os.getcwd()
 save_path_describe_dict()
@@ -32,6 +34,6 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
 
         index = int(f.split('_')[0])
         """ run_slurm 작성 및 실행 """
-        run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path)
+        run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
 

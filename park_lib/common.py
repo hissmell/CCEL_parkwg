@@ -1,7 +1,7 @@
 import os, pickle
 import shutil
 
-def write_run_slurm_sh(dir_path,describe,index,node,poscar_path):
+def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false):
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
     node_dict = {1:12,2:20,3:20,4:24,5:32}
@@ -26,7 +26,10 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path):
         f.write(
             f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {working_dir}/run_vasp.py \n")
         f.write("\n")
-        f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir}\n")
+        if restart_false == False:
+            f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir} --restart_false\n")
+        else:
+            f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir}\n")
     return run_slurm_path, working_dir
 
 def check_dict(x=[]):

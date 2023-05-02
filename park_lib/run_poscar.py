@@ -8,7 +8,7 @@ import os, subprocess
 parser = ArgumentParser()
 parser.add_argument("-p","--poscar_path",type=str,required=True)
 parser.add_argument("-w","--working_dir",type=str,required=True)
-parser.add_argument("-r","--restart",default=True,action="store_false")
+parser.add_argument("-r","--restart_false",default=True,action="store_false")
 args = parser.parse_args()
 
 poscar_path = args.poscar_path
