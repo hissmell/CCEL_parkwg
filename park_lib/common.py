@@ -65,7 +65,7 @@ def find_describe_path(root_path_node,describe='R'):
         flag = True
 
     if flag:
-        raise Exception("There is no describe you entered!")
+        raise Exception("There is no describe.txt you entered!")
 
     return_path = node.path
     return_describe = node.describe

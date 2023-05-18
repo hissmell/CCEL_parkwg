@@ -15,7 +15,7 @@ args = parser.parse_args()
 node = args.node
 describe_str_list = args.describe_str_list
 restart_false = args.restart_false
-index = args.index
+file_index = args.index
 
 root_dir = os.getcwd()
 save_path_describe_dict()
@@ -29,8 +29,8 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
             continue
         if not f[0].isdigit():
             continue
-        if index:
-            if not (index != int(f[0])):
+        if file_index:
+            if (file_index != int(f.split('_')[0])):
                 continue
 
         poscar_path = os.path.join(dir_path, f)
@@ -42,4 +42,5 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
         """ run_slurm 작성 및 실행 """
         run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
+
 
