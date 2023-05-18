@@ -29,7 +29,7 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
             continue
         if not f[0].isdigit():
             continue
-        if not index:
+        if index:
             if not (index != int(f[0])):
                 continue
 
