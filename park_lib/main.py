@@ -9,11 +9,13 @@ parser = ArgumentParser()
 parser.add_argument("-d","--describe_str_list",type=str_to_list,required=True,default=[])
 parser.add_argument("-n","--node",type=int,required=True)
 parser.add_argument("-r","--restart_false",default=True,action="store_false")
+parser.add_argument("-i","--index",type=int,default=False)
 args = parser.parse_args()
 
 node = args.node
 describe_str_list = args.describe_str_list
 restart_false = args.restart_false
+index = args.index
 
 root_dir = os.getcwd()
 save_path_describe_dict()
@@ -27,6 +29,10 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
             continue
         if not f[0].isdigit():
             continue
+        if not index:
+            if not (index != int(f[0])):
+                continue
+
         poscar_path = os.path.join(dir_path, f)
         describe = path_describe_dict[poscar_path]
         if not all(d in describe for d in describe_str_list):
