@@ -315,6 +315,7 @@ def plot_energies():
     for dir_path, dir_name, file_name in os.walk(root_dir):
         if not os.path.isfile(os.path.join(dir_path,"OSZICAR")):
             continue
+        os.chdir(dir_path)
         plot_energy()
     return
 
