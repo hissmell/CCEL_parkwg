@@ -1,5 +1,10 @@
 import os, pickle
 import shutil
+import re
+import matplotlib.pyplot as plt
+import numpy as np
+import json
+from treelib import Node, Tree
 
 def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false):
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
@@ -204,6 +209,107 @@ def start():
     copy_run_poscar()
     copy_common()
     return
+
+def get_relative_energy():
+    data = {}
+    for dir_path, dir_name, file_name in os.walk(os.getcwd()):
+        OSZICAR_path = os.path.join(dir_path,"OSZICAR")
+        if not os.path.isfile(OSZICAR_path):
+            continue
+
+        E0_value = np.inf
+
+        with open(OSZICAR_path, 'r') as file:
+            for line in file:
+                # 각 줄에서 "DAV" 문자가 없는지 확인합니다.
+                if 'DAV' not in line:
+                    # E0 값을 찾습니다.
+                    match = re.search(r"E0=\s+[-+]?\d*\.\d+([eE][-+]?\d+)?", line)
+                    if match:
+                        E0_value = float(match.group(0)[3:].strip()) if E0_value > float(match.group(0)[3:].strip()) else E0_value
+
+        data[dir_path.split("/")[-1]] = E0_value
+
+    # 가장 작은 value를 가진 key를 찾기
+    min_key = min(data, key=data.get)
+
+    output = {"minimum" : data[min_key]}
+    for k in data.keys():
+        output[k + "_rel"] = data[k] - data[min_key]
+        output[k + "_abs"] = data[k]
+
+    with open(os.path.join(os.getcwd(),"rel_abs_energies.json"),"w") as f:
+        json.dump(output,f)
+    return
+
+def json2tree(tree, json_obj, parent_node=None):
+    for k, v in json_obj.items():
+        child_node = tree.create_node(tag=k, parent=parent_node)
+        if isinstance(v, dict):
+            json2tree(v, child_node.identifier)
+        else:
+            tree.create_node(tag=f"{k}: {v}", parent=child_node.identifier)
+
+def print_relaxed_energy():
+    get_relative_energy()
+    # Load JSON data into a Python dictionary
+    with open("rel_abs_energies.json","r") as f:
+        json_data = json.load(f)
+
+    # Initialize a new tree
+    tree = Tree()
+
+    # Create root node
+    root = tree.create_node("Root")
+
+    # Convert JSON object to tree
+    json2tree(tree,json_data, root.identifier)
+
+    # Print the tree
+    tree.show()
+
+
+
+def plot_energy():
+    for dir_path, dir_name, file_name in os.walk(os.getcwd()):
+        OSZICAR_path = os.path.join(dir_path,"OSZICAR")
+        if not os.path.isfile(OSZICAR_path):
+            continue
+
+        E0_values = []
+
+        with open(OSZICAR_path, 'r') as file:
+            for line in file:
+                # 각 줄에서 "DAV" 문자가 없는지 확인합니다.
+                if 'DAV' not in line:
+                    # E0 값을 찾습니다.
+                    match = re.search(r"E0=\s+[-+]?\d*\.\d+([eE][-+]?\d+)?", line)
+                    if match:
+                        # E0 값의 시작과 끝을 찾아서 리스트에 추가합니다.
+                        E0_values.append(float(match.group(0)[3:].strip()))
+
+        # x 축 값 설정 (1부터 E0_values의 길이까지)
+        x = np.arange(1, len(E0_values) + 1)
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(x, E0_values, marker='o')
+        plt.title(dir_path.split("/")[-1] + ' | E0 Values (absolute)')
+        plt.xlabel('Iteration')
+        plt.ylabel('E0 Value')
+
+        # png 파일로 저장
+        plt.savefig(os.path.join(dir_path,dir_path.split("/")[-1]+'_E0_values_abs.png'))
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(x, [e - min(E0_values) for e in E0_values], marker='o')
+        plt.title(dir_path.split("/")[-1] + ' | E0 Values (relative)')
+        plt.xlabel('Iteration')
+        plt.ylabel('E0 Value')
+
+        plt.savefig(os.path.join(dir_path,dir_path.split("/")[-1]+'_E0_values_rel.png'))
+    return
+
 
 if __name__ == "__main__":
     save_path_describe_dict()

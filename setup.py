@@ -10,5 +10,5 @@ setup(
     license="parkwg",
     packages=["park_lib"],
     zip_safe=False,
-    install_requires=["ase"]
+    install_requires=["ase","treelib"]
 )
