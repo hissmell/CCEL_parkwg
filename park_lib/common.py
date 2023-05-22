@@ -119,6 +119,9 @@ def save_path_describe_dict(str_dir = os.getcwd()):
                 continue
             if not f[0].isdigit():
                 continue
+            if "." in f:
+                continue
+
             index = int(f.split("_")[0])
             path = os.path.join(current_dir,f)
             d = read_describe_txt(current_dir)
