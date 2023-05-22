@@ -310,6 +310,14 @@ def plot_energy():
         plt.savefig(os.path.join(dir_path,dir_path.split("/")[-1]+'_E0_values_rel.png'))
     return
 
+def plot_energies():
+    root_dir = os.getcwd()
+    for dir_path, dir_name, file_name in os.walk(root_dir):
+        if not os.path.isfile(os.path.join(dir_path,"OSZICAR")):
+            continue
+        plot_energy()
+    return
+
 
 if __name__ == "__main__":
     save_path_describe_dict()
