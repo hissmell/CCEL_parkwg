@@ -57,6 +57,7 @@ def write_describe_txt(describe=""):
 def read_describe_txt(dir_path):
     with open(os.path.join(dir_path,"describe.txt"),mode='r') as f:
         d = f.readline()
+        d.replace("\n","")
     return d
 
 def find_describe_path(root_path_node,describe='R'):
@@ -311,6 +312,7 @@ def plot_energy():
         plt.ylabel('E0 Value')
 
         plt.savefig(os.path.join(dir_path,dir_path.split("/")[-1]+'_E0_values_rel.png'))
+        plt.close()
     return
 
 def plot_energies():
