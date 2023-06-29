@@ -6,7 +6,8 @@ import numpy as np
 import json
 from treelib import Node, Tree
 
-def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false):
+def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,potcar):
+    describe = describe[2:] # remove "R_" part from describe
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
     node_dict = {1:12,2:20,3:20,4:24,5:32}
@@ -32,7 +33,7 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false):
             f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {working_dir}/run_vasp.py \n")
         f.write("\n")
         if restart_false == False:
-            f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir} --restart_false\n")
+            f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir} --potcar={potcar} --restart_false\n")
         else:
             f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir}\n")
     return run_slurm_path, working_dir
@@ -136,7 +137,7 @@ def save_path_describe_dict(str_dir = os.getcwd()):
                     raise Exception("Searching process goes over the root directory!")
                 parent_dir = "/".join(current_dir.split("\\")[:-1])
 
-            path_describe_dict[path] = describe
+            path_describe_dict[path] = "R_" + describe
 
     with open(os.path.join(str_dir,"path_describe_dict.pickle"),"wb") as g:
         pickle.dump(path_describe_dict,g)

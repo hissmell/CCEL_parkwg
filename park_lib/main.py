@@ -6,16 +6,18 @@ import os, subprocess
 
 
 parser = ArgumentParser()
-parser.add_argument("-d","--describe_str_list",type=str_to_list,required=True,default=[])
-parser.add_argument("-n","--node",type=int,required=True)
-parser.add_argument("-r","--restart_false",default=True,action="store_false")
-parser.add_argument("-i","--index",type=int,default=False)
+parser.add_argument("-d","--describe_str_list",type=str_to_list,required=True,default=[],help="describe of running poscar")
+parser.add_argument("-n","--node",type=int,required=True,help="running node")
+parser.add_argument("-r","--restart_false",default=True,action="store_false",help="if restart_false, the computation will be reset")
+parser.add_argument("-i","--index",type=int,default=False,help="specify if want to run file individually")
+parser.add_argument("-pp","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
 args = parser.parse_args()
 
 node = args.node
 describe_str_list = args.describe_str_list
 restart_false = args.restart_false
 file_index = args.index
+potcar = args.potcar
 
 root_dir = os.getcwd()
 save_path_describe_dict()
@@ -40,7 +42,7 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
 
         index = int(f.split('_')[0])
         """ run_slurm 작성 및 실행 """
-        run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false)
+        run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,potcar)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
 
 
