@@ -43,7 +43,7 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
     node_dict = {1:12,2:20,3:20,4:24,5:32}
-    run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm.sh")
+    run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
