@@ -1,5 +1,6 @@
 from common import load_path_node, find_describe_path,\
-    read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict
+    read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict\
+    ,write_run_slurm_sh_linux
 from argparse import ArgumentParser
 import os, subprocess
 
@@ -43,6 +44,7 @@ for dir_path,dir_names,file_names in os.walk(root_dir):
         index = int(f.split('_')[0])
         """ run_slurm 작성 및 실행 """
         run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,potcar)
+        _, _ = write_run_slurm_sh_linux(dir_path, describe, index, node, poscar_path, restart_false,potcar)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
 
 

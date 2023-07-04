@@ -20,8 +20,8 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
         f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
-        f.write("#SBATCH -o stdout.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
-        f.write("#SBATCH -e STDERR.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -o stdout_{index}_{describe}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -e STDERR_{index}_{describe}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
         f.write("\n")
         f.write("## HPC ENVIRONMENT DON'T REMOVE THIS PART\n")
         f.write(". /etc/profile.d/TMI.sh\n")
@@ -36,6 +36,31 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
             f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir} --potcar={potcar} --restart_false\n")
         else:
             f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir}\n")
+    return run_slurm_path, working_dir
+
+def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_false,potcar):
+    describe = describe[2:] # remove "R_" part from describe
+    working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
+    os.makedirs(working_dir,exist_ok=True)
+    node_dict = {1:12,2:20,3:20,4:24,5:32}
+    run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm.sh")
+    with open(run_slurm_path, "w") as f:
+        f.write("#!/bin/bash\n")
+        f.write("#SBATCH --nodes=1\n")
+        f.write(f"#SBATCH --ntasks-per-node={node_dict[node]:d}\n")
+        f.write(f"#SBATCH --partition=g{node}\n")
+        f.write("##\n")
+        f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
+        f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
+        f.write(f"#SBATCH -o stdout_{index}_{describe}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -e STDERR_{index}_{describe}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
+        f.write("\n")
+        f.write("## HPC ENVIRONMENT DON'T REMOVE THIS PART\n")
+        f.write(". /etc/profile.d/TMI.sh\n")
+        f.write("##\n")
+        f.write(
+            f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.vtst.std.x\n")
+        f.write("\n")
     return run_slurm_path, working_dir
 
 def check_dict(x=[]):
