@@ -65,7 +65,7 @@ calc = Vasp(
         npar=4,
         lwave=".FALSE.",
         lcharg=".FALSE.",
-        setups=potcar,
+        setups=setups,
         atoms=atoms,
         restart=RESTART
     )
