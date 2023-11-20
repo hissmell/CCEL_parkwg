@@ -24,7 +24,12 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
             raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
-        f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
+        if node != "test":
+            f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
+        elif node == "test":
+            f.write("#SBATCH --time=00-01:00          # Runtime limit: Day-HH:MM\n")
+        else:
+            raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write(f"#SBATCH -o stdout_{index}_{describe}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
         f.write(f"#SBATCH -e STDERR_{index}_{describe}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
         f.write("\n")
@@ -61,7 +66,12 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
             raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
-        f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
+        if node != "test":
+            f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
+        elif node == "test":
+            f.write("#SBATCH --time=00-01:00          # Runtime limit: Day-HH:MM\n")
+        else:
+            raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write(f"#SBATCH -o stdout_{index}_{describe}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
         f.write(f"#SBATCH -e STDERR_{index}_{describe}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
         f.write("\n")
