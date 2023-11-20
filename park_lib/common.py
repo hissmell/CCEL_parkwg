@@ -10,13 +10,18 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
     describe = describe[2:] # remove "R_" part from describe
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
-    node_dict = {1:12,2:20,3:20,4:24,5:32}
+    node_dict = {1:32,2:20,3:24,4:32,"test":20}
     run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
         f.write(f"#SBATCH --ntasks-per-node={node_dict[node]:d}\n")
-        f.write(f"#SBATCH --partition=g{node}\n")
+        if node != "test":
+            f.write(f"#SBATCH --partition=g{node}\n")
+        elif node == "test":
+            f.write(f"#SBATCH --partition={node}\n")
+        else:
+            raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
         f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
@@ -26,7 +31,7 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
         f.write("## HPC ENVIRONMENT DON'T REMOVE THIS PART\n")
         f.write(". /etc/profile.d/TMI.sh\n")
         f.write("##\n")
-        f.write("export VASP_PP_PATH=/home1/pn50212/POTCAR_dir/\n")
+        f.write("export VASP_PP_PATH=/home/pn50212/POTCAR_dir/\n")
         f.write(f"export VASP_SCRIPT={working_dir}/run_vasp.py\n")
         f.write(f"echo \"import os\" > {working_dir}/run_vasp.py\n")
         f.write(
@@ -42,13 +47,18 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
     describe = describe[2:] # remove "R_" part from describe
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
-    node_dict = {1:12,2:20,3:20,4:24,5:32}
+    node_dict = {1:32,2:20,3:24,4:32,"test":20}
     run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
         f.write(f"#SBATCH --ntasks-per-node={node_dict[node]:d}\n")
-        f.write(f"#SBATCH --partition=g{node}\n")
+        if node != "test":
+            f.write(f"#SBATCH --partition=g{node}\n")
+        elif node == "test":
+            f.write(f"#SBATCH --partition={node}\n")
+        else:
+            raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
         f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
@@ -59,7 +69,7 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
         f.write(". /etc/profile.d/TMI.sh\n")
         f.write("##\n")
         f.write(
-            f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.vtst.std.x\n")
+            f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x\n")
         f.write("\n")
     return run_slurm_path, working_dir
 
