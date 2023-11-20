@@ -8,7 +8,7 @@ import os, subprocess
 
 parser = ArgumentParser()
 parser.add_argument("-d","--describe_str_list",type=str_to_list,required=True,default=[],help="describe of running poscar")
-parser.add_argument("-n","--node",type=int,required=True,help="running node")
+parser.add_argument("-n","--node",required=True,help="running node")
 parser.add_argument("-r","--restart_false",default=True,action="store_false",help="if restart_false, the computation will be reset",required=True)
 parser.add_argument("-i","--index",type=int,default=False,help="specify if want to run file individually")
 parser.add_argument("-pp","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
