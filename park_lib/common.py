@@ -10,7 +10,7 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
     describe = describe[2:] # remove "R_" part from describe
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
-    node_dict = {1:32,2:20,3:24,4:32,"test":20}
+    node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
     run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
@@ -52,7 +52,7 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
     describe = describe[2:] # remove "R_" part from describe
     working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
     os.makedirs(working_dir,exist_ok=True)
-    node_dict = {1:32,2:20,3:24,4:32,"test":20}
+    node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
     run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
