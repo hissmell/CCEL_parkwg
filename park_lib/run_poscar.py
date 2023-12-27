@@ -48,27 +48,63 @@ setups = {"base" : potcar, "W" : "_sv"} # {"Atom symbol" : "suffix" | "Atom inte
 
 # set incar setting
 calc = Vasp(
-        directory=working_dir,
-        kpts=(3, 3, 1),
-        istart=0,
-        icharg=2,
-        ispin=2,
-        idipol=3,
-        encut=400,
-        ediff=1E-04,
-        xc='rpbe',
-        lreal='Auto',
-        nsw=600,
-        ibrion=2,
-        isif=2,
-        ediffg=-.03,
-        npar=4,
-        lwave=False,
-        lcharg=False,
-        setups=setups,
-        atoms=atoms,
-        restart=RESTART
-    )
+    # ASE setting
+    directory=working_dir,
+    atoms=atoms,
+    setups=setups,  # POTCAR setting
+
+    # KPOINT
+    kpts=(1, 1, 1),
+
+    # accuracy, speed
+    prec = "normal", # recommended value, (accurate for volume optimization, phonons, ...)
+    algo = "f", # 5x Davidson, then DIIS
+
+    # start options
+    istart=0,
+    icharg=2,
+    idipol=3,
+
+    # spin/magnetism
+    ispin=2, # spin polarized calculation? (1 no, 2 yes)
+
+    # electronic relaxation
+    encut=400, # planewave cutoff (eV)
+    ediff=2e-4, # convergence criterion for wave-functions
+    gga='PE', # PBE GGA
+    ismear=1, # -5: tetra+Bloechl; -4: tetra;...; -1 Fermi; 0 Gaussian (Insulators!) 1..N Methfessel-Paxton (metals)
+    sigma=0.2, # smearing parameter -> check that TS is smaller than 1meV per atom; metals: 0.1; insulators: 0.05
+    lreal='.FALSE.', # use g-space projectors
+    ivdw=12, # vdW potential correction option
+
+    # ionic relaxation
+    isym=0, # 0: no symmetry; 1: symmetry; 2: memory conserving symmetry (4 PAW)
+    nsw=800,
+    ibrion=2, # -1: ions not moved; 0: MD; 1: quasi-Newton 2: CG; 3: quickmin; 5: Hessian;
+    potim=0.5, # timestep/scaling for forces ... not used for CG
+    isif=2, # all relax ions, additionally: 1: pressure; 2: stress;
+    ediffg=-.03, # neg. value: force cutoff for nuclei; pos. value: free energy change
+
+    # etc
+    emin= -10,
+    emax= 10,
+    nedos= 1000,
+
+    # U
+    ldau=False, # switch off or on +U
+    ldautype=2, # 1/2/4
+    ldau_luj={'Mn': {'L': 2, 'U': 3.9, 'J': 0}, 'Ru': {'L': -1, 'U': 0, 'J': 0}, 'O': {'L': -1, 'U': 0, 'J': 0},
+              'H': {'L': -1, 'U': 0, 'J': 0}}, # l,j,u value
+    ldauprint=2,
+    lmaxmix=4,
+
+    # IO options
+    lwave=False,
+    lcharg=False,
+    laechg=False,
+    npar=4,
+    lorbit=11, # 0 RWIGS line required DOSCAR and PROCAR file
+)
 
 # do calculation!
 _ = atoms.get_potential_energy()
