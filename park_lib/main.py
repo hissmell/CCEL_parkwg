@@ -20,7 +20,7 @@ def vasp(args):
     if poscar == None:
         for root, dirnames, filenames in os.walk(working_dir):
             for filename in filenames:
-                if poscar_file_check(filename,poscar_type):
+                if poscar_file_check(filename,poscar_type,cont):
                     if poscar_type != "POSCAR":
                         poscar_file_path = os.path.join(root,filename)
                     else:
