@@ -50,7 +50,7 @@ def write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type):
         f.write(f"export VASP_SCRIPT={poscar_dirpath}/run_vasp.py\n")
         f.write(f"echo \"import os\" > {poscar_dirpath}/run_vasp.py\n")
         f.write(
-            f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {output_dir}/run_vasp.py \n")
+            f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {poscar_dirpath}/run_vasp.py \n")
         f.write("\n")
         if cont:
             f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --cont\n")
