@@ -424,6 +424,9 @@ def read_kpoints_file(file_path):
     return kpoints_dict
 
 def poscar_file_check(filename,target_exp,is_continue):
+    if (filename.endswith('CONTCAR')) and (is_continue):
+        return True
+
     if target_exp != 'POSCAR':
         if filename.endswith(target_exp):
             return True
