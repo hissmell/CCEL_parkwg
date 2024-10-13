@@ -10,5 +10,9 @@ setup(
     license="parkwg",
     packages=["park_lib"],
     zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'park=my_library:main',
+        ]},
     install_requires=["ase","treelib"]
 )

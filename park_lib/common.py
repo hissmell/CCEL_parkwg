@@ -5,13 +5,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 from treelib import Node, Tree
+from collections import defaultdict
 
-def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,potcar):
-    describe = describe[2:] # remove "R_" part from describe
-    working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
-    os.makedirs(working_dir,exist_ok=True)
+def get_filename_without_extension(file_path):
+    file_name = os.path.basename(file_path)
+    base_name, extension = os.path.splitext(file_name)
+    return base_name if extension else file_name
+
+def write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type):
+    filename = get_filename_without_extension(poscar_file_path)
+    output_dir = os.path.join(run_dir,filename)
+    os.makedirs(output_dir,exist_ok=True)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
-    run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm.sh")
+    run_slurm_path = os.path.join(output_dir,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
@@ -23,37 +29,37 @@ def write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,po
         else:
             raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write("##\n")
-        f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
+        f.write(f"#SBATCH --job-name=\"{filename}\"\n")
         if node != "test":
             f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
         elif node == "test":
             f.write("#SBATCH --time=00-01:00          # Runtime limit: Day-HH:MM\n")
         else:
             raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
-        f.write(f"#SBATCH -o stdout_{index}_{describe}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
-        f.write(f"#SBATCH -e STDERR_{index}_{describe}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -o stdout_{filename}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -e STDERR_{filename}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
         f.write("\n")
         f.write("## HPC ENVIRONMENT DON'T REMOVE THIS PART\n")
         f.write(". /etc/profile.d/TMI.sh\n")
         f.write("##\n")
         f.write("export VASP_PP_PATH=/home/pn50212/POTCAR_dir/\n")
-        f.write(f"export VASP_SCRIPT={working_dir}/run_vasp.py\n")
-        f.write(f"echo \"import os\" > {working_dir}/run_vasp.py\n")
+        f.write(f"export VASP_SCRIPT={output_dir}/run_vasp.py\n")
+        f.write(f"echo \"import os\" > {output_dir}/run_vasp.py\n")
         f.write(
-            f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {working_dir}/run_vasp.py \n")
+            f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {output_dir}/run_vasp.py \n")
         f.write("\n")
-        if restart_false == False:
-            f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir} --potcar={potcar} --restart_false\n")
+        if cont:
+            f.write(f"python ./run_poscar.py --working_dir {output_dir}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --cont\n")
         else:
-            f.write(f"python ./run_poscar.py --poscar_path={poscar_path} --working_dir={working_dir}\n")
-    return run_slurm_path, working_dir
+            f.write(f"python ./run_poscar.py --working_dir {output_dir}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom}\n")
+    return run_slurm_path, output_dir
 
-def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_false,potcar):
-    describe = describe[2:] # remove "R_" part from describe
-    working_dir = os.path.join(dir_path,f"{index}_{describe}_POSCAR")
-    os.makedirs(working_dir,exist_ok=True)
+def write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type):
+    filename = get_filename_without_extension(poscar_file_path)
+    output_dir = os.path.join(run_dir,filename)
+    os.makedirs(output_dir,exist_ok=True)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
-    run_slurm_path = os.path.join(working_dir,f"{index}_{describe}_run_slurm_linux.sh")
+    run_slurm_path = os.path.join(output_dir,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
@@ -65,15 +71,15 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
         else:
             raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
         f.write("##\n")
-        f.write(f"#SBATCH --job-name=\"{index:d}_{describe:s}\"\n")
+        f.write(f"#SBATCH --job-name=\"{filename}\"\n")
         if node != "test":
             f.write("#SBATCH --time=05-00:00          # Runtime limit: Day-HH:MM\n")
         elif node == "test":
             f.write("#SBATCH --time=00-01:00          # Runtime limit: Day-HH:MM\n")
         else:
             raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
-        f.write(f"#SBATCH -o stdout_{index}_{describe}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
-        f.write(f"#SBATCH -e STDERR_{index}_{describe}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -o stdout_{filename}.%N.%j.out         # STDOUT, %N : nodename, %j : JobID\n")
+        f.write(f"#SBATCH -e STDERR_{filename}.%N.%j.err         # STDERR, %N : nodename, %j : JobID\n")
         f.write("\n")
         f.write("## HPC ENVIRONMENT DON'T REMOVE THIS PART\n")
         f.write(". /etc/profile.d/TMI.sh\n")
@@ -81,7 +87,7 @@ def write_run_slurm_sh_linux(dir_path,describe,index,node,poscar_path,restart_fa
         f.write(
             f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x\n")
         f.write("\n")
-    return run_slurm_path, working_dir
+    return run_slurm_path, output_dir
 
 def check_dict(x=[]):
     if (type(x) != list) and (type(x) != dict):
@@ -370,6 +376,89 @@ def plot_energies():
         plot_energy()
     return
 
+
+def read_incar_file(file_path):
+    incar_dict = {}
+    with open(file_path, 'r') as file:
+        for line in file:
+            line = line.strip()
+            if '=' not in line:
+                continue
+            key, value = line.split('=', 1)
+            key = key.strip()
+            key = key.lower()
+            value = value.strip()
+            if value.upper() == '.TRUE.':
+                value = True
+            elif value.upper() == '.FALSE.':
+                value = False
+            else:
+                try:
+                    value = int(value)
+                except ValueError:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        pass 
+            incar_dict[key] = value
+    return incar_dict
+
+def read_kpoints_file(file_path):
+    kpoints_dict = {}
+
+    with open(file_path, 'r') as file:
+        lines = file.readlines()
+
+        # 3번째 줄에서 'Monkhorst-Pack' 또는 'Gamma' 확인
+        if 'Monkhorst-Pack' in lines[2]:
+            kpoints_dict['gamma'] = False
+        elif 'Gamma' in lines[2]:
+            kpoints_dict['gamma'] = True
+
+        # 4번째 줄에서 kpts 값을 추출
+        kpoints_dict['kpts'] = tuple(map(int, lines[3].strip().split()))
+
+    return kpoints_dict
+
+def poscar_file_check(filename,target_exp):
+    if target_exp != 'POSCAR':
+        if filename.endswith(target_exp):
+            return True
+        return False
+    else:
+        if (filename.endswith('POSCAR')) or (filename.endswith('CONTCAR')):
+            return True
+        else:
+            return False
+        
+def set_magmom(magmom):
+    if magmom == 'recommended':
+        magmom_dict = {'Sc':'1','Ti':'2','V':'3','Cr':'6'
+            ,'Mn':'5','Fe':'4','Co':'3','Ni':'2'
+            ,'Cu':'1','Zn':'0','Y':'1','Zr':'2'
+            ,'Nb':'5','Mo':'6','Tc':'5','Ru':'4'
+            ,'Rh':'3','Pd':'0','Ag':'1','Cd':'0'
+            ,'La':'1','Hf':'2','Ta':'3','W':'4'
+            ,'Re':'5','Os':'4','Ir':'3','Pt':'2'
+            ,'Au':'1'}
+    elif magmom == "zeros":
+        magmom_dict = defaultdict(int)
+    elif magmom == "ones":
+        magmom_dict = defaultdict(lambda: 1)
+    elif magmom.endswith('json'):
+        with open(magmom,'r') as f:
+            magmom_dict = json.load(f)
+    else:
+        raise Exception(f"Supported magmom ['recommended' (default), 'zeros', 'ones', 'json_file_path'] // Entered : {magmom}")
+    return magmom_dict
+
+def set_potcar(potcar):
+    potcar_dict = {"base" : 'recommended', "W" : "_sv"}
+    if potcar.endswith('json'):
+        with open(potcar,'r') as f:
+            new_potcar_dict = json.load(f)
+    potcar_dict.update(new_potcar_dict)
+    return potcar_dict
 
 if __name__ == "__main__":
     save_path_describe_dict()

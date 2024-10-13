@@ -1,50 +1,65 @@
 from common import load_path_node, find_describe_path,\
     read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict\
-    ,write_run_slurm_sh_linux
+    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar
 from argparse import ArgumentParser
 import os, subprocess
+from ase.calculators.vasp import Vasp
+from ase.io import read
 
 
+def vasp(args):
+    working_dir = args.working_dir
+    node = args.node
+    cont = args.cont
+    poscar = args.poscar
+    potcar = args.potcar
+    poscar_type = args.poscar_type
+    magmom = args.magmom
 
-parser = ArgumentParser()
-parser.add_argument("-d","--describe_str_list",type=str_to_list,required=True,default=[],help="describe of running poscar")
-parser.add_argument("-n","--node",required=True,help="running node")
-parser.add_argument("-r","--restart_false",default=True,action="store_false",help="if restart_false, the computation will be reset",required=True)
-parser.add_argument("-i","--index",type=int,default=False,help="specify if want to run file individually")
-parser.add_argument("-pp","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
-args = parser.parse_args()
+    # POSCAR path check
+    if poscar == None:
+        for root, dirnames, filenames in os.walk(working_dir):
+            for filename in filenames:
+                if poscar_file_check(filename,poscar_type):
+                    if poscar_type != "POSCAR":
+                        poscar_file_path = os.path.join(root,filename)
+                    else:
+                        if cont:
+                            poscar_file_path = os.path.join(root,'CONTCAR')
+                        else:
+                            poscar_file_path = os.path.join(root,'POSCAR')
 
-node = args.node
-describe_str_list = args.describe_str_list
-restart_false = args.restart_false
-file_index = args.index
-potcar = args.potcar
-
-root_dir = os.getcwd()
-save_path_describe_dict()
-path_describe_dict = load_path_describe_dict()
-
-for dir_path,dir_names,file_names in os.walk(root_dir):
-    if "POSCAR" in dir_path.split("/")[-1]:
-        continue
-    for f in file_names:
-        if "POSCAR" not in f:
-            continue
-        if not f[0].isdigit():
-            continue
-        if file_index:
-            if (file_index != int(f.split('_')[0])):
-                continue
-
-        poscar_path = os.path.join(dir_path, f)
-        describe = path_describe_dict[poscar_path]
-        if not all(d in describe for d in describe_str_list):
-            continue
-
-        index = int(f.split('_')[0])
+                    """ run_slurm 작성 및 실행 """
+                    run_dir = root
+                    run_slurm_path,working_dir = write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
+                    _, _ = write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
+                    subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
+    else:
+        poscar_file_path = os.path.join(working_dir,poscar)
         """ run_slurm 작성 및 실행 """
-        run_slurm_path,working_dir = write_run_slurm_sh(dir_path,describe,index,node,poscar_path,restart_false,potcar)
-        _, _ = write_run_slurm_sh_linux(dir_path, describe, index, node, poscar_path, restart_false,potcar)
+        run_dir = working_dir
+        run_slurm_path,working_dir = write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
+        _, _ = write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
+
+
+def main():
+    parser = ArgumentParser(description="Calculator commands")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    parser_vasp = subparsers.add_parser('vasp', help='for convinient vasp calculation')
+
+    parser_vasp.add_argument("-d","--working_dir",type=str,default=os.getcwd(),help="working directory")
+    parser_vasp.add_argument("-n","--node",required=True,help="running node, ['1', '2', '3', '4', 'test']")
+    parser_vasp.add_argument("-c","--cont",default=False,action="store_true",help="if continue is specified, the computation will continue calculation")
+    parser_vasp.add_argument("-pos","--poscar",type=str,default=None,help="POSCAR file path (default = None)")
+    parser_vasp.add_argument("-pot","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
+    parser_vasp.add_argument("-t","--poscar_type",type=str,default="POSCAR",help="POSCAR file type setup (default = 'POSCAR') : 'POSCAR', 'xyz', 'cif' ...")
+    parser_vasp.add_argument("-m","--magmom",type=str,default="recommended",help="Magnetic moment setting")
+
+
+    args = parser.parse_args()
+
+    if args.command == 'vasp':
+        vasp(args=args)
 
 
