@@ -17,7 +17,7 @@ def get_absolute_directory_from_path(file_path):
     directory = os.path.dirname(absolute_path)
     return directory
 
-def write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type):
+def write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path):
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
@@ -53,12 +53,12 @@ def write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type):
             f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {poscar_dirpath}/run_vasp.py \n")
         f.write("\n")
         if cont:
-            f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --cont\n")
+            f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path} --cont\n")
         else:
-            f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom}\n")
+            f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path}\n")
     return run_slurm_path, poscar_dirpath
 
-def write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type):
+def write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path):
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}

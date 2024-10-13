@@ -14,6 +14,8 @@ parser.add_argument("-pos","--poscar",type=str,default=None,help="POSCAR file pa
 parser.add_argument("-pot","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
 parser.add_argument("-t","--poscar_type",type=str,default="POSCAR",help="POSCAR file type setup (default = 'POSCAR') : 'POSCAR', 'xyz', 'cif' ...")
 parser.add_argument("-m","--magmom",type=str,defsault="recommended",help="Magnetic moment setting")
+parser.add_argument("-i","--incar",type=str,help="incar file path")
+parser.add_argument("-k","--kpoints",type=str,help="kpoints file path")
 
 args = parser.parse_args()
 
@@ -24,15 +26,8 @@ poscar_path = args.poscar
 potcar = args.potcar
 poscar_type = args.poscar_type
 magmom = args.magmom
-
-
-# INCAR, KPOINTS check
-INCAR_path = os.path.join(working_dir,"INCAR")
-KPOINTS_path = os.path.join(working_dir,"KPOINTS")
-if not os.path.isfile(INCAR_path):
-    raise Exception(f'INCAR path is not valid! \n [INCAR path] {INCAR_path}')
-if not os.path.isfile(KPOINTS_path):
-    raise Exception(f'KPOINTS path is not valid! \n [KPOINTS path] {KPOINTS_path}')
+INCAR_path = args.incar
+KPOINTS_path = args.kpoints
 
 incar_dict = read_incar_file(INCAR_path)
 kpoints_dict = read_kpoints_file(KPOINTS_path)

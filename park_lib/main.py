@@ -35,16 +35,16 @@ def vasp(args):
                         if cont:
                             poscar_file_path = os.path.join(root,'CONTCAR')
                         else:
-                            poscar_file_path = os.path.join(root,'POSCAR')
+                            poscar_file_path = os.path.join(root,filename)
 
-                    run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type)
-                    _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type)
+                    run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
+                    _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
                     subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
                     print(f"{poscar_file_path} has been submitted")
     else:
         poscar_file_path = os.path.join(working_dir,poscar)
-        run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type)
-        _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type)
+        run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
+        _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
         print(f"{poscar_file_path} has been submitted")
 
