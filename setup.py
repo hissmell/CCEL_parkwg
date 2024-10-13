@@ -12,7 +12,7 @@ setup(
     zip_safe=False,
     entry_points={
         'console_scripts': [
-            'park=my_library:main',
+            'park=park_lib:main',
         ]},
     install_requires=["ase","treelib"]
 )
