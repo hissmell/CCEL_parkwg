@@ -12,12 +12,16 @@ def get_filename_without_extension(file_path):
     base_name, extension = os.path.splitext(file_name)
     return base_name if extension else file_name
 
-def write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type):
+def get_absolute_directory_from_path(file_path):
+    absolute_path = os.path.abspath(file_path)
+    directory = os.path.dirname(absolute_path)
+    return directory
+
+def write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type):
     filename = get_filename_without_extension(poscar_file_path)
-    output_dir = os.path.join(run_dir,filename)
-    os.makedirs(output_dir,exist_ok=True)
+    poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
-    run_slurm_path = os.path.join(output_dir,f"run_slurm.sh")
+    run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
@@ -43,23 +47,22 @@ def write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_t
         f.write(". /etc/profile.d/TMI.sh\n")
         f.write("##\n")
         f.write("export VASP_PP_PATH=/home/pn50212/POTCAR_dir/\n")
-        f.write(f"export VASP_SCRIPT={output_dir}/run_vasp.py\n")
-        f.write(f"echo \"import os\" > {output_dir}/run_vasp.py\n")
+        f.write(f"export VASP_SCRIPT={poscar_dirpath}/run_vasp.py\n")
+        f.write(f"echo \"import os\" > {poscar_dirpath}/run_vasp.py\n")
         f.write(
             f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {output_dir}/run_vasp.py \n")
         f.write("\n")
         if cont:
-            f.write(f"python ./run_poscar.py --working_dir {output_dir}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --cont\n")
+            f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --cont\n")
         else:
-            f.write(f"python ./run_poscar.py --working_dir {output_dir}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom}\n")
-    return run_slurm_path, output_dir
+            f.write(f"python ./run_poscar.py --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom}\n")
+    return run_slurm_path, poscar_dirpath
 
-def write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type):
+def write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type):
     filename = get_filename_without_extension(poscar_file_path)
-    output_dir = os.path.join(run_dir,filename)
-    os.makedirs(output_dir,exist_ok=True)
+    poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
-    run_slurm_path = os.path.join(output_dir,f"run_slurm.sh")
+    run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
@@ -87,7 +90,7 @@ def write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,po
         f.write(
             f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x\n")
         f.write("\n")
-    return run_slurm_path, output_dir
+    return run_slurm_path, poscar_dirpath
 
 def check_dict(x=[]):
     if (type(x) != list) and (type(x) != dict):

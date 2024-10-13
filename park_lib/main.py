@@ -29,17 +29,13 @@ def vasp(args):
                         else:
                             poscar_file_path = os.path.join(root,'POSCAR')
 
-                    """ run_slurm 작성 및 실행 """
-                    run_dir = root
-                    run_slurm_path,working_dir = write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
-                    _, _ = write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
+                    run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type)
+                    _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type)
                     subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
     else:
         poscar_file_path = os.path.join(working_dir,poscar)
-        """ run_slurm 작성 및 실행 """
-        run_dir = working_dir
-        run_slurm_path,working_dir = write_run_slurm_sh(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
-        _, _ = write_run_slurm_sh_linux(run_dir,node,poscar_file_path,potcar,magmom,cont,poscar_type)
+        run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type)
+        _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
 
 
@@ -64,6 +60,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
+
 
 
