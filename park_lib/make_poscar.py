@@ -1,7 +1,7 @@
-from common import write_describe_txt, find_describe_path
-from common import move_dir, set_path_node, save_path_node
-from common import set_poscar_dir, save_path_describe_dict
-from common import PathNode, check_dict
+from .common import write_describe_txt, find_describe_path
+from .common import move_dir, set_path_node, save_path_node
+from .common import set_poscar_dir, save_path_describe_dict
+from .common import PathNode, check_dict
 import os
 
 atoms = ["Pt","Fe","Co","Ni","Cu","Zn"] # dictionary -> key = name, value = description
