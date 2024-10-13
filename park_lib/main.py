@@ -16,6 +16,14 @@ def vasp(args):
     poscar_type = args.poscar_type
     magmom = args.magmom
 
+    # INCAR, KPOINTS check
+    INCAR_path = os.path.join(working_dir,"INCAR")
+    KPOINTS_path = os.path.join(working_dir,"KPOINTS")
+    if not os.path.isfile(INCAR_path):
+        raise Exception(f'INCAR path is not valid! \n [INCAR path] {INCAR_path}')
+    if not os.path.isfile(KPOINTS_path):
+        raise Exception(f'KPOINTS path is not valid! \n [KPOINTS path] {KPOINTS_path}')
+
     # POSCAR path check
     if poscar == None:
         for root, dirnames, filenames in os.walk(working_dir):
