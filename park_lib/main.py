@@ -62,4 +62,8 @@ def main():
     if args.command == 'vasp':
         vasp(args=args)
 
+if __name__ == "__main__":
+    main()
+    
+
 
