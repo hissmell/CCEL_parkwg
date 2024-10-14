@@ -23,7 +23,6 @@ parser.add_argument("-k","--kpoints",type=str,help="kpoints file path")
 args = parser.parse_args()
 
 working_dir = args.working_dir
-node = args.node
 cont = args.cont
 poscar_path = args.poscar
 potcar = args.potcar
