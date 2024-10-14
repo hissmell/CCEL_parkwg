@@ -466,7 +466,7 @@ def set_potcar(potcar):
     if potcar.endswith('json'):
         with open(potcar,'r') as f:
             new_potcar_dict = json.load(f)
-    potcar_dict.update(new_potcar_dict)
+        potcar_dict.update(new_potcar_dict)
     return potcar_dict
 
 if __name__ == "__main__":
