@@ -1,6 +1,6 @@
 from .common import load_path_node, find_describe_path,\
     read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict\
-    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar
+    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar,get_absolute_directory_from_path
 from argparse import ArgumentParser
 from ase.calculators.vasp import Vasp
 from ase.io import read
@@ -31,7 +31,7 @@ KPOINTS_path = args.kpoints
 
 incar_dict = read_incar_file(INCAR_path)
 kpoints_dict = read_kpoints_file(KPOINTS_path)
-
+working_dir = get_absolute_directory_from_path(poscar_path)
 # magmom check
 magmom_dict = set_magmom(magmom)
 
@@ -61,6 +61,14 @@ vasp_input_dict = {'directory' : working_dir,
 vasp_input_dict.update(incar_dict)
 vasp_input_dict.update(kpoints_dict)
 
+for k,v in vasp_input_dict.items():
+    print(k)
+    print(v)
+
 # Do calc!
-calc = Vasp(**vasp_input_dict)
+try:
+    calc = Vasp(**vasp_input_dict)
+except Exception as e:
+    print(f"================Error message===============")
+    print(e)
 _ = atoms.get_potential_energy()
