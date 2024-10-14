@@ -1,11 +1,12 @@
 from .common import load_path_node, find_describe_path,\
     read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict\
-    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar
+    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar,get_absolute_directory_from_path
 from argparse import ArgumentParser
 import os, subprocess
 from ase.calculators.vasp import Vasp
 from ase.io import read
 
+library_dirpath = get_absolute_directory_from_path(__file__)
 
 def vasp(args):
     working_dir = args.working_dir
@@ -37,14 +38,14 @@ def vasp(args):
                         else:
                             poscar_file_path = os.path.join(root,filename)
 
-                    run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
-                    _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
+                    run_slurm_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
+                    _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
                     subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
                     print(f"{poscar_file_path} has been submitted")
     else:
         poscar_file_path = os.path.join(working_dir,poscar)
-        run_slurm_path,working_dir = write_run_slurm_sh(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
-        _, _ = write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
+        run_slurm_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
+        _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
         print(f"{poscar_file_path} has been submitted")
 
