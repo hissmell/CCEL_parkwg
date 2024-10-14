@@ -17,7 +17,7 @@ parser.add_argument("-c","--cont",default=False,action="store_true",help="if con
 parser.add_argument("-pos","--poscar",type=str,default=None,help="POSCAR file path (default = None)")
 parser.add_argument("-pot","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
 parser.add_argument("-t","--poscar_type",type=str,default="POSCAR",help="POSCAR file type setup (default = 'POSCAR') : 'POSCAR', 'xyz', 'cif' ...")
-parser.add_argument("-m","--magmom",type=str,defsault="recommended",help="Magnetic moment setting")
+parser.add_argument("-m","--magmom",type=str,default="recommended",help="Magnetic moment setting")
 parser.add_argument("-i","--incar",type=str,help="incar file path")
 parser.add_argument("-k","--kpoints",type=str,help="kpoints file path")
 
