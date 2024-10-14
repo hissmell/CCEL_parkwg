@@ -12,7 +12,6 @@ import os, subprocess
 
 parser = ArgumentParser()
 parser.add_argument("-d","--working_dir",type=str,default=os.getcwd(),help="working directory")
-parser.add_argument("-n","--node",required=True,help="running node, ['1', '2', '3', '4', 'test']")
 parser.add_argument("-c","--cont",default=False,action="store_true",help="if continue is specified, the computation will continue calculation")
 parser.add_argument("-pos","--poscar",type=str,default=None,help="POSCAR file path (default = None)")
 parser.add_argument("-pot","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
