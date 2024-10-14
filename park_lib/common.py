@@ -62,7 +62,7 @@ def write_run_slurm_sh_linux(node,poscar_file_path,potcar,magmom,cont,poscar_typ
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
-    run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
+    run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
