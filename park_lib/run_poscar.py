@@ -63,6 +63,10 @@ vasp_input_dict = {'directory' : working_dir,
 vasp_input_dict.update(incar_dict)
 vasp_input_dict.update(kpoints_dict)
 
+for key in list(vasp_input_dict.keys()):
+    if key.lower() == 'magmom':
+        del vasp_input_dict[key]
+
 for k,v in vasp_input_dict.items():
     print(k)
     print(v)
