@@ -17,11 +17,14 @@ def get_absolute_directory_from_path(file_path):
     directory = os.path.dirname(absolute_path)
     return directory
 
-def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path):
+def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server):
     run_poscar_path = os.path.join(library_dirpath,'run_poscar.py')
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
-    node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
+    if server == 'cpu':
+        node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
+    elif server == 'gpu':
+        node_dict = {"snu_g1":32}
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
@@ -59,10 +62,13 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
             f.write(f"python {run_poscar_path} --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path}\n")
     return run_slurm_path, poscar_dirpath
 
-def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path):
+def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server):
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
-    node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
+    if server == 'cpu':
+        node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
+    elif server == 'gpu':
+        node_dict = {"snu_g1":32}
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
