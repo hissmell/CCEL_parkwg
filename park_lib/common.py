@@ -24,7 +24,7 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
     if server == 'cpu':
         node_dict = {"g1":32,"g2":20,"g3":24,"g4":32,"test":20}
     elif server == 'gpu':
-        node_dict = {"snu_g1":32}
+        node_dict = {"snu-g1":32}
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
@@ -63,7 +63,7 @@ def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom
     if server == 'cpu':
         node_dict = {"g1":32,"g2":20,"g3":24,"g4":32,"test":20}
     elif server == 'gpu':
-        node_dict = {"snu_g1":32}
+        node_dict = {"snu-g1":32}
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
