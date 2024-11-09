@@ -67,6 +67,7 @@ def visual(args):
     structure.repeat(repeat_atom)
     if not cell_on:
         structure.cell = None
+
     povray_settings = {'canvas_width' : canvas_width}
     if not transmittances:
         transmittances = [0.0 for _ in range(len(structure))]
@@ -83,9 +84,10 @@ def visual(args):
     for line in lines:
         row = list(map(float, line.split()))
         rotation.append(row)
-
     rotation = R.from_matrix(rotation)
     rotation = rotation.as_euler("xyz", degrees=True)
+    rotation = f"{rotation[0]}x, {rotation[1]}y, {rotation[2]}z"
+
     renderer = write('./temp.pov', structure, rotation=rotation,povray_settings=povray_settings) 
     with open(f'./temp.ini', 'a') as file:
         file.write('Library_Path="/home/pn50212/povray-3.6/include"\n')
