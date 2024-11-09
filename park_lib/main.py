@@ -64,7 +64,7 @@ def visual(args):
     canvas_width = args.canvas_width
     
     structure = read(input_filepath)
-    structure.repeat(repeat_atom)
+    structure = structure.repeat(repeat_atom)
     if not cell_on:
         structure.cell = None
 
