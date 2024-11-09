@@ -71,7 +71,7 @@ def visual(args):
     if not transmittances:
         transmittances = [0.0 for _ in range(len(structure))]
         povray_settings.update({'transmittances': transmittances})
-    if not heatmaps:
+    if heatmaps:
         mapped_colors = [
             (c, 0.0, 1.0 - c) for c in heatmaps  # (Red, Green, Blue)
         ]
