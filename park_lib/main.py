@@ -114,7 +114,6 @@ def main():
     parser_vasp.add_argument("-m","--magmom",type=str,default="recommended",help="Magnetic moment setting")
     parser_vasp.add_argument("-s","--server",type=str,default="cpu",help="Server, ['cpu' or 'gpu']")
 
-    parser_visual = subparsers.add_parser('visual', help='for povray visualization')
     parser_visual.add_argument("-i","--input_filepath",type=str,required=True,help="input structure file path")
     parser_visual.add_argument("-o","--output_filepath",type=str,required=True,help="output image file path")
     parser_visual.add_argument("-r","--repeat_atom",type=int,nargs='+',default=[1,1,1],help="repeatation")
