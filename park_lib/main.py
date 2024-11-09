@@ -78,12 +78,7 @@ def visual(args):
         ]
         povray_settings.update({'colors': mapped_colors})
 
-
-    lines = orientation.strip().split("\n")
-    rotation = []
-    for line in lines:
-        row = list(map(float, line.split()))
-        rotation.append(row)
+    rotation = [orientation[:3],orientation[3:6],orientation[6:]]
     rotation = R.from_matrix(rotation)
     rotation = rotation.as_euler("xyz", degrees=True)
     rotation = f"{rotation[0]}x, {rotation[1]}y, {rotation[2]}z"
@@ -119,7 +114,7 @@ def main():
     parser_visual.add_argument("-i","--input_filepath",type=str,required=True,help="input structure file path")
     parser_visual.add_argument("-o","--output_filepath",type=str,required=True,help="output image file path")
     parser_visual.add_argument("-r","--repeat_atom",type=int,nargs='+',default=[1,1,1],help="repeatation")
-    parser_visual.add_argument("-ori","--orientation",type=str,default='+0.955480  +0.294974  -0.006949\n-0.042581  +0.161156  +0.986010\n+0.291967  -0.941817  +0.166542',help="camera orientation")
+    parser_visual.add_argument("-ori","--orientation",type=float,nargs='+',default=[+0.955480,+0.294974,-0.006949,-0.042581,+0.161156,+0.986010,+0.291967,-0.941817,+0.166542],help="camera orientation")
     parser_visual.add_argument("-c","--cell_on",action='store_true',help="visual cell")
     parser_visual.add_argument("-t","--transmittances",type=float,nargs='+',default=None,help="atom transmittances")
     parser_visual.add_argument("-H","--heatmaps",type=float,nargs='+',default=None,help="atom heatmaps")
