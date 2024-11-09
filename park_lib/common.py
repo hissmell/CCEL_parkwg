@@ -22,7 +22,7 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     if server == 'cpu':
-        node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
+        node_dict = {"g1":32,"g2":20,"g3":24,"g4":32,"test":20}
     elif server == 'gpu':
         node_dict = {"snu_g1":32}
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
@@ -30,12 +30,7 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
         f.write(f"#SBATCH --ntasks-per-node={node_dict[node]:d}\n")
-        if node != "test":
-            f.write(f"#SBATCH --partition=g{node}\n")
-        elif node == "test":
-            f.write(f"#SBATCH --partition={node}\n")
-        else:
-            raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
+        f.write(f"#SBATCH --partition={node}\n")
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{filename}\"\n")
         if node != "test":
@@ -66,7 +61,7 @@ def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     if server == 'cpu':
-        node_dict = {"1":32,"2":20,"3":24,"4":32,"test":20}
+        node_dict = {"g1":32,"g2":20,"g3":24,"g4":32,"test":20}
     elif server == 'gpu':
         node_dict = {"snu_g1":32}
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm_linux.sh")
@@ -74,12 +69,7 @@ def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom
         f.write("#!/bin/bash\n")
         f.write("#SBATCH --nodes=1\n")
         f.write(f"#SBATCH --ntasks-per-node={node_dict[node]:d}\n")
-        if node != "test":
-            f.write(f"#SBATCH --partition=g{node}\n")
-        elif node == "test":
-            f.write(f"#SBATCH --partition={node}\n")
-        else:
-            raise Exception("Possible node name : g1, g2, g3, g4 and 'test'")
+        f.write(f"#SBATCH --partition={node}\n")
         f.write("##\n")
         f.write(f"#SBATCH --job-name=\"{filename}\"\n")
         if node != "test":
