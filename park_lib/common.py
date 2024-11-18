@@ -382,6 +382,10 @@ def read_incar_file(file_path):
     with open(file_path, 'r') as file:
         for line in file:
             line = line.strip()
+            if not line or line.startswith('#') or line.startswith('!'):
+                continue
+            if '!' in line:
+                line = line.split('!', 1)[0].strip()
             if '=' not in line:
                 continue
             key, value = line.split('=', 1)
@@ -399,7 +403,7 @@ def read_incar_file(file_path):
                     try:
                         value = float(value)
                     except ValueError:
-                        pass 
+                        pass
             incar_dict[key] = value
     return incar_dict
 
