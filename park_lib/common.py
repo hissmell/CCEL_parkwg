@@ -471,3 +471,19 @@ def set_potcar(potcar):
 
 if __name__ == "__main__":
     save_path_describe_dict()
+
+def rename(old_name, new_name):
+    try:
+        if os.path.exists(new_name):
+            os.remove(new_name)
+            print(f"'{new_name}' has been removed to overwrite")
+        
+        # 이름 변경
+        os.rename(old_name, new_name)
+        print(f"File name has been changed successfully : '{old_name}' -> '{new_name}'")
+    except FileNotFoundError:
+        print(f"Can't find the file which is {old_name}")
+    except PermissionError:
+        print(f"Don't have authorship to change the file : {old_name} ")
+    except Exception as e:
+        print(f"Error has been encountered during the file name change : {e}")

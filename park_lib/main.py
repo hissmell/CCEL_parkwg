@@ -1,6 +1,6 @@
 from .common import load_path_node, find_describe_path,\
     read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict\
-    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar,get_absolute_directory_from_path
+    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar,get_absolute_directory_from_path,rename
 from argparse import ArgumentParser
 import os, subprocess, copy
 from ase.calculators.vasp import Vasp
@@ -47,21 +47,12 @@ def vasp(args):
                     subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
                     print(f"{poscar_file_path} has been submitted")
 
-                    if filename == 'POSCAR':
-                        continue
-                    else:
-                        os.remove(os.path.join(working_dir,'POSCAR'))
     else:
         poscar_file_path = os.path.join(working_dir,poscar)
         run_slurm_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
         _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
         subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
         print(f"{poscar_file_path} has been submitted")
-
-        if poscar == 'POSCAR':
-            pass
-        else:
-            os.remove(os.path.join(working_dir,'POSCAR'))
 
 def visual(args):
     input_filepath = args.input_filepath
