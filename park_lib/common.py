@@ -89,6 +89,42 @@ def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom
         f.write("\n")
     return run_slurm_path, poscar_dirpath
 
+def write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server):
+    vasp_path = os.getenv('VASP_PATH')
+    home_path = os.getenv('HOME')
+    if not vasp_path:
+        raise Exception("Error: VASP_PATH is not set")
+
+    run_poscar_path = os.path.join(library_dirpath,'run_poscar.py')
+    filename = get_filename_without_extension(poscar_file_path)
+    poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
+    qsub_path = os.path.join(poscar_dirpath,f"qsub.sh")
+    with open(qsub_path, "w") as f:
+        f.write("#!/bin/sh\n")
+        f.write(f"#PBS -N  \"{filename}\"\n")
+        f.write(f"#PBS -V\n")
+        f.write(f"#PBS -A vasp\n")
+        f.write(f"#PBS -q normal\n")
+        f.write(f"#PBS -l select=2:ncpus=68:mpiprocs=68:ompthreads=1\n")
+        f.write(f"#PBS -l walltime=48:00:00\n")
+        f.write(f"#PBS -m abe\n")
+        f.write(f"##PBS -M snupark@snu.ac.kr\n")
+        f.write(f"#PBS -l select=2:ncpus=68:mpiprocs=68:ompthreads=1\n")
+        f.write(f"\n")
+        f.write(f"\n")
+        f.write(f"cd $PBS_O_WORKDIR")
+        f.write(f"\n")
+        f.write(f"\n")
+        f.write(f"export ASE_VASP_COMMAND=\'mpirun {vasp_path}\'\n")
+        f.write(f"export VASP_PP_PATH={home_path}/POTCAR_dir/\n")
+        f.write("\n")
+        if cont:
+            f.write(f"python {run_poscar_path} --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path} --cont\n > vasp.out")
+        else:
+            f.write(f"python {run_poscar_path} --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path}\n > vasp.out")
+
+    return qsub_path, poscar_dirpath
+
 def check_dict(x=[]):
     if (type(x) != list) and (type(x) != dict):
         raise Exception("List or Dictionaty type must be put")

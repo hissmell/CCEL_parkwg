@@ -1,6 +1,7 @@
 from .common import load_path_node, find_describe_path,\
     read_describe_txt, write_run_slurm_sh, load_path_describe_dict,str_to_list, save_path_describe_dict\
-    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar,get_absolute_directory_from_path,rename
+    ,write_run_slurm_sh_linux, read_incar_file, read_kpoints_file, poscar_file_check,set_magmom,set_potcar,get_absolute_directory_from_path,rename,\
+    write_qsub_sh
 from argparse import ArgumentParser
 import os, subprocess, copy
 from ase.calculators.vasp import Vasp
@@ -42,17 +43,27 @@ def vasp(args):
                         else:
                             poscar_file_path = os.path.join(root,filename)
 
-                    run_slurm_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+                    if server != 'kisti':
+                        sub_file_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+                        subprocess.call(["sbatch",f"{sub_file_path}"],shell=False)
+                    elif server == 'kisti':
+                        sub_file_path,working_dir = write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+                        subprocess.call(["qsub",f"{sub_file_path}"],shell=False)
+                    else:
+                        raise Exception(f"Server is not valid! \n [Server] {server}")
                     _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
-                    subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
                     print(f"{poscar_file_path} has been submitted")
 
     else:
         poscar_file_path = os.path.join(working_dir,poscar)
-        run_slurm_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
-        _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
-        subprocess.call(["sbatch",f"{run_slurm_path}"],shell=False)
-        print(f"{poscar_file_path} has been submitted")
+        if server != 'kisti':
+            sub_file_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+            subprocess.call(["sbatch",f"{sub_file_path}"],shell=False)
+        elif server == 'kisti':
+            sub_file_path,working_dir = write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+            subprocess.call(["qsub",f"{sub_file_path}"],shell=False)
+        else:
+            raise Exception(f"Server is not valid! \n [Server] {server}")
 
 def visual(args):
     input_filepath = args.input_filepath
@@ -110,7 +121,7 @@ def main():
     parser_vasp.add_argument("-pot","--potcar",type=str,default="recommended",help="POTCAR setup (default = 'recommended') : 'minimal', 'recommended', 'GW'")
     parser_vasp.add_argument("-t","--poscar_type",type=str,default="POSCAR",help="POSCAR file type setup (default = 'POSCAR') : 'POSCAR', 'xyz', 'cif' ...")
     parser_vasp.add_argument("-m","--magmom",type=str,default="recommended",help="Magnetic moment setting")
-    parser_vasp.add_argument("-s","--server",type=str,default="cpu",help="Server, ['cpu' or 'gpu']")
+    parser_vasp.add_argument("-s","--server",type=str,default="cpu",help="Server, ['cpu' or 'gpu' or 'kisti']")
 
     parser_visual.add_argument("-i","--input_filepath",type=str,required=True,help="input structure file path")
     parser_visual.add_argument("-o","--output_filepath",type=str,required=True,help="output image file path")
