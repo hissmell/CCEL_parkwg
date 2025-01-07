@@ -45,13 +45,13 @@ def vasp(args):
 
                     if server != 'kisti':
                         sub_file_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+                        _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
                         subprocess.call(["sbatch",f"{sub_file_path}"],shell=False)
                     elif server == 'kisti':
                         sub_file_path,working_dir = write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
                         subprocess.call(["qsub",f"{sub_file_path}"],shell=False)
                     else:
                         raise Exception(f"Server is not valid! \n [Server] {server}")
-                    _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
                     print(f"{poscar_file_path} has been submitted")
 
     else:
