@@ -114,7 +114,7 @@ def write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,posca
         f.write(f"cd $PBS_O_WORKDIR")
         f.write(f"\n")
         f.write(f"\n")
-        f.write(f"export ASE_VASP_COMMAND=\'mpirun {vasp_path}\'\n")
+        f.write(f"export ASE_VASP_COMMAND=\"mpirun {vasp_path}\"\n")
         f.write(f"export VASP_PP_PATH={home_path}/POTCAR_dir/\n")
         f.write("\n")
         if cont:
