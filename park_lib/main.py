@@ -21,7 +21,7 @@ def vasp(args):
     poscar_type = args.poscar_type
     magmom = args.magmom
     server = args.server
-
+    solvation = args.solvation
     # INCAR, KPOINTS check
     INCAR_path = os.path.join(working_dir,"INCAR")
     KPOINTS_path = os.path.join(working_dir,"KPOINTS")
@@ -44,11 +44,11 @@ def vasp(args):
                             poscar_file_path = os.path.join(root,filename)
 
                     if server != 'kisti':
-                        sub_file_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
-                        _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+                        sub_file_path,working_dir = write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server,solvation)
+                        _, _ = write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server,solvation)
                         subprocess.call(["sbatch",f"{sub_file_path}"],shell=False)
                     elif server == 'kisti':
-                        sub_file_path,working_dir = write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server)
+                        sub_file_path,working_dir = write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,INCAR_path,KPOINTS_path,server,solvation)
                         subprocess.call(["qsub",f"{sub_file_path}"],shell=False)
                     else:
                         raise Exception(f"Server is not valid! \n [Server] {server}")
