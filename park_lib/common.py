@@ -101,7 +101,7 @@ def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom
         f.write("\n")
     return run_slurm_path, poscar_dirpath
 
-def write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server):
+def write_qsub_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server,solvation):
     vasp_path = os.getenv('VASP_PATH')
     home_path = os.getenv('HOME')
     if not vasp_path:
