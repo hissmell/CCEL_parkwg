@@ -17,7 +17,7 @@ def get_absolute_directory_from_path(file_path):
     directory = os.path.dirname(absolute_path)
     return directory
 
-def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server):
+def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server,solvation):
     run_poscar_path = os.path.join(library_dirpath,'run_poscar.py')
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
@@ -25,6 +25,12 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
         node_dict = {"g1":32,"g2":20,"g3":24,"g4":32,"test":20}
     elif server == 'gpu':
         node_dict = {"snu-g1":32}
+    
+    if solvation:
+        vasp_path = '/TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.vaspsol.std.x'
+    else:
+        vasp_path = '/TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x'
+
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
@@ -49,7 +55,7 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
         f.write(f"export VASP_SCRIPT={poscar_dirpath}/run_vasp.py\n")
         f.write(f"echo \"import os\" > {poscar_dirpath}/run_vasp.py\n")
         f.write(
-            f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x')\" >> {poscar_dirpath}/run_vasp.py \n")
+            f"echo \"exitcode = os.system('mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS  {vasp_path}')\" >> {poscar_dirpath}/run_vasp.py \n")
         f.write("\n")
         if cont:
             f.write(f"python {run_poscar_path} --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path} --cont\n")
@@ -57,13 +63,19 @@ def write_run_slurm_sh(library_dirpath,node,poscar_file_path,potcar,magmom,cont,
             f.write(f"python {run_poscar_path} --working_dir {poscar_dirpath}  --poscar={poscar_file_path} --poscar_type {poscar_type} --potcar={potcar} --magmom {magmom} --incar {incar_path} --kpoints {kpoints_path}\n")
     return run_slurm_path, poscar_dirpath
 
-def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server):
+def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom,cont,poscar_type,incar_path,kpoints_path,server,solvation):
     filename = get_filename_without_extension(poscar_file_path)
     poscar_dirpath = get_absolute_directory_from_path(poscar_file_path)
     if server == 'cpu':
         node_dict = {"g1":32,"g2":20,"g3":24,"g4":32,"test":20}
     elif server == 'gpu':
         node_dict = {"snu-g1":32}
+        
+    if solvation:
+        vasp_path = '/TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.vaspsol.std.x'
+    else:
+        vasp_path = '/TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x'
+
     run_slurm_path = os.path.join(poscar_dirpath,f"run_slurm_linux.sh")
     with open(run_slurm_path, "w") as f:
         f.write("#!/bin/bash\n")
@@ -85,7 +97,7 @@ def write_run_slurm_sh_linux(library_dirpath,node,poscar_file_path,potcar,magmom
         f.write(". /etc/profile.d/TMI.sh\n")
         f.write("##\n")
         f.write(
-            f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS /TGM/Apps/VASP/VASP_BIN/6.3.2/vasp.6.3.2.beef.std.x\n")
+            f"mpiexec.hydra -genv I_MPI_DEBUG 5 -np $SLURM_NTASKS {vasp_path}\n")
         f.write("\n")
     return run_slurm_path, poscar_dirpath
 
